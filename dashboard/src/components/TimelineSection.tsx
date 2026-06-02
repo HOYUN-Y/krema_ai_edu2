@@ -260,116 +260,134 @@ export default function TimelineSection({ rows }: TimelineSectionProps) {
           </div>
         </div>
 
-        {/* Month labels — 셀 크기 기반으로 정확한 위치 계산 */}
-        {monthLabels.length > 0 && (
-          <div style={{ marginLeft: DAY_LABEL_W + GAP, marginBottom: '4px', position: 'relative', height: '14px' }}>
-            {monthLabels.map(({ weekIndex, label }) => (
-              <div
-                key={`${weekIndex}-${label}`}
-                style={{
-                  position: 'absolute',
-                  left: weekIndex * (cellSize + GAP),
-                  fontSize: '10px',
-                  color: 'var(--text-mute)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {label}
-              </div>
-            ))}
-          </div>
-        )}
+        {/* 히트맵 + 요일별 패턴을 가로로 나란히 */}
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
 
-        {/* Heatmap grid — ref로 폭 측정, 고정 픽셀 셀 */}
-        <div ref={heatmapRef} style={{ display: 'flex', gap: `${GAP}px`, alignItems: 'flex-start' }}>
-          {/* Day labels — 셀 높이에 맞춤 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px`, flexShrink: 0, width: DAY_LABEL_W }}>
-            {DAY_LABELS.map((d, i) => (
-              <div key={d} style={{
-                fontSize: '9px',
-                color: i % 2 === 1 ? 'var(--text-mute)' : 'transparent',
-                height: cellSize,
-                lineHeight: `${cellSize}px`,
-                userSelect: 'none',
-              }}>
-                {d}
-              </div>
-            ))}
-          </div>
-
-          {/* Weeks: 고정 픽셀 셀로 렌더, 폭에 꽉 참 */}
-          <div style={{ display: 'flex', gap: `${GAP}px` }}>
-            {weeks.map((week, wi) => (
-              <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
-                {Array.from({ length: 7 }).map((_, di) => {
-                  const cell = week.find((c) => c.day === di)
-                  const isPadding = cell?.count === -1
-                  const intensity = (cell && !isPadding && cell.count > 0)
-                    ? Math.round((cell.count / maxCount) * 100)
-                    : 0
-                  return (
-                    <div
-                      key={di}
-                      title={cell && !isPadding && cell.count > 0 ? `${cell.date}: ${cell.count}건` : undefined}
-                      style={{
-                        width: cellSize,
-                        height: cellSize,
-                        borderRadius: Math.max(2, Math.floor(cellSize / 4)),
-                        background: isPadding
-                          ? 'transparent'
-                          : intensity > 0
-                            ? `color-mix(in oklch, var(--accent) ${Math.max(intensity, 15)}%, var(--border))`
-                            : 'var(--border)',
-                        cursor: (!isPadding && cell && cell.count > 0) ? 'pointer' : 'default',
-                        transition: 'transform 0.1s',
-                        opacity: isPadding ? 0 : 1,
-                        flexShrink: 0,
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isPadding && cell && cell.count > 0) e.currentTarget.style.transform = 'scale(1.3)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)'
-                      }}
-                    />
-                  )
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-mute)' }}>적음</span>
-          {[15, 35, 55, 75, 100].map((pct) => (
-            <div key={pct} style={{ width: '12px', height: '12px', borderRadius: '2px', background: `color-mix(in oklch, var(--accent) ${pct}%, var(--border))` }} />
-          ))}
-          <span style={{ fontSize: '10px', color: 'var(--text-mute)' }}>많음</span>
-        </div>
-
-        {/* 요일별 수신 패턴 */}
-        <div style={{ marginTop: '20px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-mute)', marginBottom: '10px' }}>요일별 수신 패턴</div>
-          <ResponsiveContainer width="100%" height={80}>
-            <BarChart data={dowPattern} barCategoryGap="20%">
-              <XAxis dataKey="label" tick={{ fill: 'var(--text-mute)', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)', fontSize: '12px' }}
-                formatter={(v: number) => [`${v}건`, '수신']}
-              />
-              <Bar dataKey="count" radius={[3, 3, 0, 0]}>
-                {dowPattern.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={entry.count === maxDow
-                      ? 'oklch(82% 0.18 142)'
-                      : `color-mix(in oklch, var(--accent) 40%, var(--border))`}
-                  />
+          {/* 왼쪽: 히트맵 */}
+          <div style={{ flex: 'none' }}>
+            {/* Month labels */}
+            {monthLabels.length > 0 && (
+              <div style={{ marginLeft: DAY_LABEL_W + GAP, marginBottom: '4px', position: 'relative', height: '14px' }}>
+                {monthLabels.map(({ weekIndex, label }) => (
+                  <div
+                    key={`${weekIndex}-${label}`}
+                    style={{
+                      position: 'absolute',
+                      left: weekIndex * (cellSize + GAP),
+                      fontSize: '10px',
+                      color: 'var(--text-mute)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {label}
+                  </div>
                 ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Grid — ref로 폭 측정 */}
+            <div ref={heatmapRef} style={{ display: 'flex', gap: `${GAP}px`, alignItems: 'flex-start' }}>
+              {/* Day labels */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px`, flexShrink: 0, width: DAY_LABEL_W }}>
+                {DAY_LABELS.map((d, i) => (
+                  <div key={d} style={{
+                    fontSize: '9px',
+                    color: i % 2 === 1 ? 'var(--text-mute)' : 'transparent',
+                    height: cellSize,
+                    lineHeight: `${cellSize}px`,
+                    userSelect: 'none',
+                  }}>
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              {/* Weeks */}
+              <div style={{ display: 'flex', gap: `${GAP}px` }}>
+                {weeks.map((week, wi) => (
+                  <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
+                    {Array.from({ length: 7 }).map((_, di) => {
+                      const cell = week.find((c) => c.day === di)
+                      const isPadding = cell?.count === -1
+                      const intensity = (cell && !isPadding && cell.count > 0)
+                        ? Math.round((cell.count / maxCount) * 100)
+                        : 0
+                      return (
+                        <div
+                          key={di}
+                          title={cell && !isPadding && cell.count > 0 ? `${cell.date}: ${cell.count}건` : undefined}
+                          style={{
+                            width: cellSize,
+                            height: cellSize,
+                            borderRadius: Math.max(2, Math.floor(cellSize / 4)),
+                            background: isPadding
+                              ? 'transparent'
+                              : intensity > 0
+                                ? `color-mix(in oklch, var(--accent) ${Math.max(intensity, 15)}%, var(--border))`
+                                : 'var(--border)',
+                            cursor: (!isPadding && cell && cell.count > 0) ? 'pointer' : 'default',
+                            transition: 'transform 0.1s',
+                            opacity: isPadding ? 0 : 1,
+                            flexShrink: 0,
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isPadding && cell && cell.count > 0) e.currentTarget.style.transform = 'scale(1.3)'
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)'
+                          }}
+                        />
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '8px' }}>
+              <span style={{ fontSize: '10px', color: 'var(--text-mute)' }}>적음</span>
+              {[15, 35, 55, 75, 100].map((pct) => (
+                <div key={pct} style={{ width: cellSize, height: cellSize, borderRadius: Math.max(2, Math.floor(cellSize / 4)), background: `color-mix(in oklch, var(--accent) ${pct}%, var(--border))` }} />
+              ))}
+              <span style={{ fontSize: '10px', color: 'var(--text-mute)' }}>많음</span>
+            </div>
+          </div>
+
+          {/* 오른쪽: 요일별 수신 패턴 — 히트맵 높이에 맞춤 */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-mute)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+              요일별 수신 패턴
+            </div>
+            {/* 수직 바 차트: 히트맵 높이(7*cellSize + 6*GAP)에 맞춤 */}
+            <ResponsiveContainer width="100%" height={7 * cellSize + 6 * GAP + 24}>
+              <BarChart data={dowPattern} barCategoryGap="25%" margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                <XAxis
+                  dataKey="label"
+                  tick={{ fill: 'var(--text-mute)', fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)', fontSize: '12px' }}
+                  formatter={(v: number) => [`${v}건`, '수신']}
+                  cursor={{ fill: 'color-mix(in oklch, var(--accent) 8%, transparent)' }}
+                />
+                <Bar dataKey="count" radius={[3, 3, 0, 0]}>
+                  {dowPattern.map((entry, i) => (
+                    <Cell
+                      key={i}
+                      fill={entry.count === maxDow
+                        ? 'oklch(82% 0.18 142)'
+                        : `color-mix(in oklch, var(--accent) 45%, var(--border))`}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
         </div>
       </div>
 
