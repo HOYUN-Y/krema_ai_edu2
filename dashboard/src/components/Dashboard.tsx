@@ -4,37 +4,35 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { SheetData } from '@/lib/types'
 import KPIBand from './KPIBand'
-import SectionWrapper from './SectionWrapper'
 import TimelineSection from './TimelineSection'
 import CategorySection from './CategorySection'
 import EmailSection from './EmailSection'
 import ReviewSection from './ReviewSection'
 import TableSection from './TableSection'
+import ImportanceSection from './ImportanceSection'
+import AISummarySection from './AISummarySection'
+import ScheduleSection from './ScheduleSection'
+import AttachmentSection from './AttachmentSection'
+import RecruitmentSection from './RecruitmentSection'
 
 interface DashboardProps {
   data: SheetData
 }
 
-const SECTIONS = ['수신 추이', '분류 분포', '발신자 분석', '검토 필요', '전체 데이터']
+const TABS = [
+  { id: '메일 현황', icon: '📬' },
+  { id: '중요도 분석', icon: '📊' },
+  { id: '답장 필요', icon: '📩' },
+  { id: 'AI 요약', icon: '🤖' },
+  { id: '일정 추출', icon: '📅' },
+  { id: '첨부파일', icon: '📎' },
+  { id: '메일 통계', icon: '📈' },
+  { id: '채용 관리', icon: '💼' },
+]
 
 export default function Dashboard({ data }: DashboardProps) {
   const router = useRouter()
-  const [allExpanded, setAllExpanded] = useState(true)
-  const [expanded, setExpanded] = useState<boolean[]>(SECTIONS.map(() => true))
-
-  function toggleAll() {
-    const next = !allExpanded
-    setAllExpanded(next)
-    setExpanded(SECTIONS.map(() => next))
-  }
-
-  function toggleSection(i: number) {
-    setExpanded((prev) => {
-      const next = [...prev]
-      next[i] = !next[i]
-      return next
-    })
-  }
+  const [activeTab, setActiveTab] = useState('메일 현황')
 
   const fetchedDate = new Date(data.fetchedAt).toLocaleString('ko-KR', {
     year: 'numeric',
@@ -45,52 +43,80 @@ export default function Dashboard({ data }: DashboardProps) {
   })
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
-      {/* Header */}
-      <div
-        style={{
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Sidebar */}
+      <nav style={{
+        width: '200px',
+        minHeight: '100vh',
+        background: 'var(--surface)',
+        borderRight: '1px solid var(--border)',
+        padding: '24px 0',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        zIndex: 100,
+      }}>
+        <div style={{ padding: '0 20px 20px', borderBottom: '1px solid var(--border)', marginBottom: '8px' }}>
+          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>📬 Mail Dashboard</div>
+        </div>
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.id
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 20px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                borderRadius: '8px',
+                margin: '2px 8px',
+                width: 'calc(100% - 16px)',
+                textAlign: 'left',
+                border: 'none',
+                background: isActive
+                  ? 'color-mix(in oklch, var(--accent) 12%, transparent)'
+                  : 'transparent',
+                color: isActive ? 'var(--accent)' : 'var(--text-dim)',
+                fontWeight: isActive ? 600 : 400,
+                transition: 'background 0.15s, color 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 6%, transparent)'
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) e.currentTarget.style.background = 'transparent'
+              }}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.id}</span>
+            </button>
+          )
+        })}
+      </nav>
+
+      {/* Main content */}
+      <main style={{ marginLeft: '200px', padding: '32px', flex: 1, minWidth: 0 }}>
+        {/* Header */}
+        <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '32px',
+          marginBottom: '24px',
           flexWrap: 'wrap',
-          gap: '16px',
-        }}
-      >
-        <div>
-          <h1
-            style={{
-              fontSize: '24px',
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: 'var(--text)',
-              marginBottom: '4px',
-            }}
-          >
-            📬 Mail Dashboard
-          </h1>
-          <p style={{ fontSize: '12px', color: 'var(--text-mute)' }}>
-            마지막 업데이트: {fetchedDate} · 총 {data.rows.length}건
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={toggleAll}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '8px',
-              border: '1px solid var(--border)',
-              background: 'var(--surface)',
-              color: 'var(--text-dim)',
-              fontSize: '12px',
-              fontWeight: 500,
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--surface-2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--surface)')}
-          >
-            {allExpanded ? '모두 접기' : '모두 펼치기'}
-          </button>
+          gap: '12px',
+        }}>
+          <div>
+            <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
+              {TABS.find((t) => t.id === activeTab)?.icon} {activeTab}
+            </h1>
+            <p style={{ fontSize: '12px', color: 'var(--text-mute)' }}>
+              마지막 업데이트: {fetchedDate} · 총 {data.rows.length}건
+            </p>
+          </div>
           <button
             onClick={() => router.refresh()}
             style={{
@@ -101,6 +127,7 @@ export default function Dashboard({ data }: DashboardProps) {
               color: 'var(--accent)',
               fontSize: '12px',
               fontWeight: 500,
+              cursor: 'pointer',
               transition: 'background 0.15s',
             }}
             onMouseEnter={(e) =>
@@ -113,51 +140,29 @@ export default function Dashboard({ data }: DashboardProps) {
             ↻ 새로고침
           </button>
         </div>
-      </div>
 
-      {/* KPI */}
-      <KPIBand rows={data.rows} />
+        {/* KPI always visible */}
+        <div style={{ marginBottom: '24px' }}>
+          <KPIBand rows={data.rows} />
+        </div>
 
-      {/* Sections */}
-      <SectionWrapper
-        title={SECTIONS[0]}
-        expanded={expanded[0]}
-        onToggle={() => toggleSection(0)}
-      >
-        <TimelineSection rows={data.rows} />
-      </SectionWrapper>
-
-      <SectionWrapper
-        title={SECTIONS[1]}
-        expanded={expanded[1]}
-        onToggle={() => toggleSection(1)}
-      >
-        <CategorySection rows={data.rows} />
-      </SectionWrapper>
-
-      <SectionWrapper
-        title={SECTIONS[2]}
-        expanded={expanded[2]}
-        onToggle={() => toggleSection(2)}
-      >
-        <EmailSection rows={data.rows} />
-      </SectionWrapper>
-
-      <SectionWrapper
-        title={SECTIONS[3]}
-        expanded={expanded[3]}
-        onToggle={() => toggleSection(3)}
-      >
-        <ReviewSection rows={data.rows} />
-      </SectionWrapper>
-
-      <SectionWrapper
-        title={SECTIONS[4]}
-        expanded={expanded[4]}
-        onToggle={() => toggleSection(4)}
-      >
-        <TableSection rows={data.rows} />
-      </SectionWrapper>
+        {/* Tab content */}
+        <div>
+          {activeTab === '메일 현황' && <TimelineSection rows={data.rows} />}
+          {activeTab === '중요도 분석' && <ImportanceSection rows={data.rows} />}
+          {activeTab === '답장 필요' && <ReviewSection rows={data.rows} />}
+          {activeTab === 'AI 요약' && <AISummarySection rows={data.rows} />}
+          {activeTab === '일정 추출' && <ScheduleSection rows={data.rows} />}
+          {activeTab === '첨부파일' && <AttachmentSection rows={data.rows} />}
+          {activeTab === '메일 통계' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <CategorySection rows={data.rows} />
+              <EmailSection rows={data.rows} />
+            </div>
+          )}
+          {activeTab === '채용 관리' && <RecruitmentSection rows={data.rows} />}
+        </div>
+      </main>
     </div>
   )
 }
