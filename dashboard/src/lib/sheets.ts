@@ -68,9 +68,13 @@ export async function fetchSheetData(): Promise<SheetData> {
   const saJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || ''
   const isPlaceholder = !saJson || saJson === '여기에_JSON_한_줄로'
 
-  const values = isPlaceholder
-    ? fetchViaGws()
-    : await fetchViaServiceAccount()
-
-  return { rows: parseRows(values), fetchedAt: new Date().toISOString() }
+  try {
+    const values = isPlaceholder
+      ? fetchViaGws()
+      : await fetchViaServiceAccount()
+    return { rows: parseRows(values), fetchedAt: new Date().toISOString() }
+  } catch (e) {
+    console.error('[sheets] fetch failed:', e)
+    return { rows: [], fetchedAt: new Date().toISOString() }
+  }
 }
