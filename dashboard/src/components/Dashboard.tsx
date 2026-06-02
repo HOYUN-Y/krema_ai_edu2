@@ -15,6 +15,9 @@ import ScheduleSection from './ScheduleSection'
 import AttachmentSection from './AttachmentSection'
 import RecruitmentSection from './RecruitmentSection'
 import Icon from './Icon'
+import SearchBar from './SearchBar'
+import MailDetailModal from './MailDetailModal'
+import type { MailRow } from '@/lib/types'
 
 interface DashboardProps {
   data: SheetData
@@ -34,6 +37,7 @@ const TABS = [
 export default function Dashboard({ data }: DashboardProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('메일 현황')
+  const [selectedMail, setSelectedMail] = useState<MailRow | null>(null)
 
   const fetchedDate = new Date(data.fetchedAt).toLocaleString('ko-KR', {
     year: 'numeric',
@@ -123,32 +127,27 @@ export default function Dashboard({ data }: DashboardProps) {
               마지막 업데이트: {fetchedDate} · 총 {data.rows.length}건
             </p>
           </div>
-          <button
-            onClick={() => router.refresh()}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              border: '1px solid color-mix(in oklch, var(--accent) 30%, var(--border))',
-              background: 'color-mix(in oklch, var(--accent) 10%, var(--surface))',
-              color: 'var(--accent)',
-              fontSize: '12px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 18%, var(--surface))')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 10%, var(--surface))')
-            }
-          >
-            <Icon name="refresh" size={14} />
-            새로고침
-          </button>
+
+          {/* 전역 검색 + 새로고침 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, justifyContent: 'flex-end', maxWidth: '560px' }}>
+            <SearchBar rows={data.rows} onSelect={(mail) => setSelectedMail(mail)} />
+            <button
+              onClick={() => router.refresh()}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '8px', flexShrink: 0,
+                border: '1px solid color-mix(in oklch, var(--accent) 30%, var(--border))',
+                background: 'color-mix(in oklch, var(--accent) 10%, var(--surface))',
+                color: 'var(--accent)', fontSize: '12px', fontWeight: 500,
+                cursor: 'pointer', transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 18%, var(--surface))')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 10%, var(--surface))')}
+            >
+              <Icon name="refresh" size={14} />
+              새로고침
+            </button>
+          </div>
         </div>
 
         {/* KPI always visible */}
@@ -173,6 +172,14 @@ export default function Dashboard({ data }: DashboardProps) {
           {activeTab === '채용 관리' && <RecruitmentSection rows={data.rows} />}
         </div>
       </main>
+
+      {/* 메일 상세 모달 */}
+      {selectedMail && (
+        <MailDetailModal
+          mail={selectedMail}
+          onClose={() => setSelectedMail(null)}
+        />
+      )}
     </div>
   )
 }
