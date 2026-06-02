@@ -1,7 +1,9 @@
 # krema_ai_edu2
 
-Gmail 데이터를 Google Sheets로 수집하고, 시각화 대시보드로 보여주는 프로젝트입니다.  
+Gmail 데이터를 Google Sheets로 수집하고, Next.js 시각화 대시보드로 보여주는 프로젝트입니다.  
 Claude Code 기반 제작 교육 Day 2.
+
+**라이브 URL:** https://krema-ai-edu2-bami.vercel.app
 
 ---
 
@@ -13,9 +15,9 @@ krema_ai_edu2/
 ├── gmail_to_sheets_demo.js   # Gmail → Sheets 수집 (전체 메일, 데모용)
 ├── dashboard/                # Next.js 15 대시보드 웹앱
 │   ├── src/
-│   │   ├── app/              # App Router (layout, login, dashboard, API)
+│   │   ├── app/              # App Router (layout, dashboard, API)
 │   │   ├── components/       # UI 컴포넌트
-│   │   └── lib/              # Sheets 연동, 인증, 타입
+│   │   └── lib/              # Sheets 연동, 타입
 │   ├── .env.local            # 환경변수 (git 제외)
 │   └── README.md             # 대시보드 상세 가이드
 └── README.md                 # 이 파일
@@ -70,25 +72,35 @@ node gmail_to_sheets.js
 
 ## 2. Mail Dashboard (Next.js 웹앱)
 
-Google Sheets 데이터를 시각화하는 읽기 전용 대시보드입니다.
+Google Sheets 데이터를 시각화하는 읽기 전용 대시보드입니다.  
+로그인 없이 누구나 접근 가능합니다.
 
 ### 기술 스택
 
 - **Next.js 15** (App Router, TypeScript)
-- **NextAuth v5** (Google OAuth)
-- **Recharts** (차트)
-- **Google Sheets API** (서비스계정 또는 gws CLI)
+- **Recharts** (차트 시각화)
+- **Google Sheets API** (서비스 계정)
 
-### 시각화 섹션
+### 대시보드 탭 구성
 
-| 섹션 | 내용 |
-|------|------|
-| KPI 밴드 | 총 티켓 · 미회신 · 지연 건수 · 평균 중요도 |
-| 타임라인 | 일별 스파크라인 + 8주 활동 히트맵 |
-| 카테고리 | 분류별 / 처리상태별 도넛 차트 |
-| 발신자 | Top 10 발신자 · Top 5 도메인 랭킹 |
-| 검토 뷰 | 미회신 · 검토필요 카드 리스트 (AI 초안 포함) |
-| 전체 테이블 | 검색 · 필터 · 정렬 · Gmail 링크 |
+| 탭 | 내용 |
+|-----|------|
+| 메일 현황 | KPI 밴드 · 일별 수신 추이 · 활동 히트맵 · 요일별 패턴 |
+| 중요도 분석 | 중요도 분포 · 발신자별 중요도 · 지연 현황 |
+| 답장 필요 | 미회신 · 검토필요 카드 리스트 (AI 초안 포함) |
+| AI 요약 | AI 회신 초안 목록 |
+| 일정 추출 | 메일 내 일정 관련 항목 |
+| 첨부파일 | 첨부파일 관련 메일 목록 |
+| 메일 통계 | 분류별 · 상태별 도넛 차트 · 발신자 · 도메인 랭킹 |
+| 채용 관리 | 채용 관련 메일 분류 |
+
+### 주요 기능
+
+- **전역 검색바** — 발신자, 분류, AI 초안 내용 실시간 검색 (최대 8건)
+- **메일 상세 모달** — 검색 결과 클릭 시 전체 내용 + AI 초안 팝업
+- **Gmail 바로가기** — 검색 결과 및 상세 모달에서 원본 메일 직접 이동
+- **활동 히트맵** — 4주/8주/12주/26주 기간 선택, 화면 너비에 맞게 동적 렌더링
+- **다크 테마** — oklch 색상 토큰 기반 디자인 시스템, SVG 아이콘
 
 ### 로컬 실행
 
@@ -99,35 +111,49 @@ npm run dev
 # → http://localhost:3000
 ```
 
-### 환경변수
+로컬에서는 `GOOGLE_SERVICE_ACCOUNT_JSON`이 없으면 `gws` CLI로 자동 fallback합니다.
 
-`dashboard/.env.local` 파일에 아래 값을 입력합니다.
+### 환경변수 (로컬)
+
+`dashboard/.env.local` 파일:
 
 ```env
 GOOGLE_SERVICE_ACCOUNT_JSON=     # 서비스계정 JSON (한 줄), 없으면 gws CLI 자동 사용
 GOOGLE_SHEETS_ID=                # 스프레드시트 ID
-GOOGLE_SHEET_TAB=                # 시트 탭 이름
-GOOGLE_CLIENT_ID=                # GCP OAuth 클라이언트 ID
-GOOGLE_CLIENT_SECRET=            # GCP OAuth 클라이언트 Secret
-ALLOWED_HOSTED_DOMAINS=          # 허용 도메인 (비우면 전체 허용)
-NEXTAUTH_SECRET=                 # openssl rand -base64 32
+GOOGLE_SHEET_TAB=                # 시트 탭 이름 (예: dummy mail data)
+AUTH_SECRET=                     # openssl rand -base64 32
+NEXTAUTH_SECRET=                 # AUTH_SECRET과 동일한 값
 NEXTAUTH_URL=http://localhost:3000
 AUTH_URL=http://localhost:3000
 AUTH_TRUST_HOST=true
 ```
 
-### Google OAuth 설정
+### Vercel 배포
 
-1. [GCP 콘솔](https://console.cloud.google.com) → API 및 서비스 → 사용자 인증 정보
-2. OAuth 2.0 클라이언트 ID 생성 (웹 애플리케이션)
-3. 승인된 JavaScript 원본: `http://localhost:3000`
-4. 승인된 리디렉션 URI: `http://localhost:3000/api/auth/callback/google`
-5. OAuth 동의 화면 → 테스트 사용자에 본인 계정 추가
+**프로젝트 설정**
 
-### 서비스계정 미설정 시 (로컬 개발)
+| 항목 | 값 |
+|------|----|
+| Root Directory | `dashboard` |
+| Framework | Next.js |
 
-`GOOGLE_SERVICE_ACCOUNT_JSON`이 없으면 로컬에 설치된 `gws` CLI로 자동 fallback합니다.  
-`gws` 인증이 완료된 환경에서는 별도 서비스계정 없이도 동작합니다.
+**필수 환경변수**
+
+| Key | Value |
+|-----|-------|
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | 서비스계정 JSON 한 줄 |
+| `GOOGLE_SHEETS_ID` | 스프레드시트 ID |
+| `GOOGLE_SHEET_TAB` | 시트 탭 이름 |
+| `AUTH_SECRET` | openssl rand -base64 32 |
+| `AUTH_URL` | https://your-domain.vercel.app |
+| `NEXTAUTH_URL` | https://your-domain.vercel.app |
+| `AUTH_TRUST_HOST` | true |
+
+**서비스 계정 JSON 한 줄 변환:**
+
+```bash
+cat ~/Downloads/서비스계정파일.json | python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin)))"
+```
 
 ---
 
