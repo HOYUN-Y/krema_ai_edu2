@@ -66,7 +66,7 @@ const PERIOD_OPTIONS = [
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토']
 
 export default function TimelineSection({ rows }: TimelineSectionProps) {
-  const [periodDays, setPeriodDays] = useState(56)
+  const [periodDays, setPeriodDays] = useState(182)
   const heatmapRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(800)
 
@@ -361,7 +361,7 @@ export default function TimelineSection({ rows }: TimelineSectionProps) {
             </div>
             {/* 수직 바 차트: 히트맵 높이(7*cellSize + 6*GAP)에 맞춤 */}
             <ResponsiveContainer width="100%" height={7 * cellSize + 6 * GAP + 24}>
-              <BarChart data={dowPattern} barCategoryGap="25%" margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <BarChart data={dowPattern} barCategoryGap="40%" barSize={10} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                 <XAxis
                   dataKey="label"
                   tick={{ fill: 'var(--text-mute)', fontSize: 10 }}
