@@ -162,48 +162,81 @@ export default function SearchBar({ rows, onSelect }: SearchBarProps) {
             return (
               <div
                 key={mail.ticketId}
-                onMouseDown={e => { e.preventDefault(); handleSelect(mail) }}
                 onMouseEnter={() => setActiveIdx(i)}
                 style={{
-                  padding: '10px 14px',
-                  cursor: 'pointer',
-                  background: isActive ? 'color-mix(in oklch, var(--accent) 8%, transparent)' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'stretch',
                   borderTop: i === 0 ? 'none' : '1px solid var(--border)',
+                  background: isActive ? 'color-mix(in oklch, var(--accent) 8%, transparent)' : 'transparent',
                   transition: 'background 0.1s',
                 }}
               >
-                {/* Row 1: 발신자 + 상태 + 날짜 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                    <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>
-                      {highlight(name || email, query)}
-                    </span>
-                    {mail.category && (
-                      <span style={{
-                        fontSize: '10px', padding: '1px 7px', borderRadius: '999px',
-                        background: 'color-mix(in oklch, var(--accent-3) 15%, transparent)',
-                        border: '1px solid color-mix(in oklch, var(--accent-3) 25%, transparent)',
-                        color: 'var(--accent-3)', whiteSpace: 'nowrap', flexShrink: 0,
-                      }}>
-                        {mail.category}
+                {/* 클릭 영역 — 모달 열기 */}
+                <div
+                  onMouseDown={e => { e.preventDefault(); handleSelect(mail) }}
+                  style={{ flex: 1, minWidth: 0, padding: '10px 14px', cursor: 'pointer' }}
+                >
+                  {/* Row 1: 발신자 + 상태 + 날짜 */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                        {highlight(name || email, query)}
                       </span>
-                    )}
+                      {mail.category && (
+                        <span style={{
+                          fontSize: '10px', padding: '1px 7px', borderRadius: '999px',
+                          background: 'color-mix(in oklch, var(--accent-3) 15%, transparent)',
+                          border: '1px solid color-mix(in oklch, var(--accent-3) 25%, transparent)',
+                          color: 'var(--accent-3)', whiteSpace: 'nowrap', flexShrink: 0,
+                        }}>
+                          {mail.category}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                      {mail.status && (
+                        <span style={{ fontSize: '10px', color: statusColor, fontWeight: 500 }}>{mail.status}</span>
+                      )}
+                      <span style={{ fontSize: '10px', color: 'var(--text-mute)', whiteSpace: 'nowrap' }}>
+                        {mail.receivedAt?.slice(0, 10)}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                    {mail.status && (
-                      <span style={{ fontSize: '10px', color: statusColor, fontWeight: 500 }}>{mail.status}</span>
-                    )}
-                    <span style={{ fontSize: '10px', color: 'var(--text-mute)', whiteSpace: 'nowrap' }}>
-                      {mail.receivedAt?.slice(0, 10)}
-                    </span>
-                  </div>
+                  {/* Row 2: 내용 미리보기 */}
+                  {preview && (
+                    <div style={{ fontSize: '12px', color: 'var(--text-mute)', lineHeight: '1.5', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                      {highlight(preview, query)}
+                    </div>
+                  )}
                 </div>
 
-                {/* Row 2: 내용 미리보기 */}
-                {preview && (
-                  <div style={{ fontSize: '12px', color: 'var(--text-mute)', lineHeight: '1.5', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                    {highlight(preview, query)}
-                  </div>
+                {/* Gmail 바로가기 아이콘 */}
+                {mail.gmailLink && (
+                  <a
+                    href={mail.gmailLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onMouseDown={e => e.stopPropagation()}
+                    title="Gmail에서 열기"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: '40px', flexShrink: 0,
+                      borderLeft: '1px solid var(--border)',
+                      color: 'var(--text-mute)',
+                      textDecoration: 'none',
+                      transition: 'color 0.15s, background 0.15s',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.color = 'var(--accent)'
+                      e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 10%, transparent)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.color = 'var(--text-mute)'
+                      e.currentTarget.style.background = 'transparent'
+                    }}
+                  >
+                    <Icon name="externalLink" size={13} />
+                  </a>
                 )}
               </div>
             )

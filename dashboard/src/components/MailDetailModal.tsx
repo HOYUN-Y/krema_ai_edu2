@@ -204,35 +204,42 @@ export default function MailDetailModal({ mail, onClose }: MailDetailModalProps)
 
         {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-mute)' }}>ID: {mail.ticketId}</span>
-          {mail.gmailLink && (
-            <a
-              href={mail.gmailLink}
-              target="_blank"
-              rel="noopener noreferrer"
+          <span style={{ fontSize: '11px', color: 'var(--text-mute)', fontFamily: 'var(--font-geist-mono), monospace' }}>
+            {mail.ticketId}
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={onClose}
               style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '8px 16px', borderRadius: '8px',
-                border: '1px solid var(--border)',
-                background: 'var(--surface)',
-                color: 'var(--text-dim)',
-                fontSize: '12px', fontWeight: 500,
-                textDecoration: 'none',
-                transition: 'border-color 0.15s, color 0.15s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'color-mix(in oklch, var(--accent) 40%, var(--border))'
-                e.currentTarget.style.color = 'var(--accent)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.color = 'var(--text-dim)'
+                padding: '8px 16px', borderRadius: '8px', cursor: 'pointer',
+                border: '1px solid var(--border)', background: 'transparent',
+                color: 'var(--text-mute)', fontSize: '12px', fontWeight: 500,
               }}
             >
-              <Icon name="externalLink" size={13} />
-              Gmail에서 열기
-            </a>
-          )}
+              닫기
+            </button>
+            {mail.gmailLink && (
+              <a
+                href={mail.gmailLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '7px',
+                  padding: '8px 18px', borderRadius: '8px',
+                  background: 'var(--accent)',
+                  color: 'var(--bg)',
+                  fontSize: '12px', fontWeight: 600,
+                  textDecoration: 'none',
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+              >
+                <Icon name="externalLink" size={13} color="var(--bg)" />
+                Gmail에서 열기
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </>
