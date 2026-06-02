@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import type { MailRow } from '@/lib/types'
+import Icon from './Icon'
 
 interface ReviewSectionProps {
   rows: MailRow[]
@@ -36,7 +37,7 @@ function Pill({
         fontWeight: 500,
         whiteSpace: 'nowrap',
         boxShadow: glow
-          ? `0 0 8px color-mix(in oklch, ${color} 40%, transparent)`
+          ? `0 0 0 1px color-mix(in oklch, ${color} 40%, transparent), 0 0 8px color-mix(in oklch, ${color} 30%, transparent)`
           : 'none',
       }}
     >
@@ -70,12 +71,18 @@ export default function ReviewSection({ rows }: ReviewSectionProps) {
       <div
         style={{
           textAlign: 'center',
-          padding: '40px',
-          color: 'var(--text-mute)',
-          fontSize: '14px',
+          padding: '48px 24px',
+          border: '1px dashed var(--border)',
+          borderRadius: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '8px',
         }}
       >
-        검토 필요 항목이 없습니다.
+        <Icon name="reply" size={32} color="var(--text-mute)" />
+        <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)' }}>검토 필요 항목이 없습니다</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-mute)' }}>미회신 메일이 없거나 모두 처리되었습니다</div>
       </div>
     )
   }
@@ -147,7 +154,7 @@ export default function ReviewSection({ rows }: ReviewSectionProps) {
                 <Pill label={row.sentiment} color={sentimentColor} />
               )}
               {row.isDelayed && (
-                <Pill label="⚠ SLA 초과" color="var(--accent-2)" glow />
+                <Pill label="SLA 초과" color="var(--accent-2)" glow />
               )}
             </div>
 

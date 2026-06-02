@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import type { MailRow } from '@/lib/types'
+import Icon from './Icon'
 
 interface Props { rows: MailRow[] }
 
@@ -52,7 +53,7 @@ function extractDateMentions(text: string, row: MailRow): ScheduleItem[] {
       const ctxEnd = Math.min(text.length, m.index + 60)
       items.push({
         date: d,
-        label: '📅 날짜 언급',
+        label: '날짜 언급',
         context: text.slice(ctxStart, ctxEnd).trim(),
         row,
         daysUntil,
@@ -67,7 +68,7 @@ function extractDateMentions(text: string, row: MailRow): ScheduleItem[] {
     const ctx = extractMeetingContext(text)
     items.push({
       date: null,
-      label: '📅 미팅',
+      label: '미팅',
       context: ctx,
       row,
       daysUntil: null,
@@ -135,9 +136,10 @@ export default function ScheduleSection({ rows }: Props) {
 
   if (items.length === 0) {
     return (
-      <div style={{ ...cardStyle, textAlign: 'center', padding: '60px 24px' }}>
-        <div style={{ fontSize: '40px', marginBottom: '12px' }}>📅</div>
-        <p style={{ fontSize: '14px', color: 'var(--text-mute)' }}>추출된 일정이 없습니다.</p>
+      <div style={{ border: '1px dashed var(--border)', borderRadius: '12px', textAlign: 'center', padding: '60px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+        <Icon name="calendar" size={32} color="var(--text-mute)" />
+        <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)' }}>추출된 일정이 없습니다</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-mute)' }}>날짜 또는 미팅 언급이 포함된 메일이 표시됩니다</div>
       </div>
     )
   }
@@ -179,8 +181,9 @@ export default function ScheduleSection({ rows }: Props) {
                 flexShrink: 0, textAlign: 'center',
                 background: 'var(--surface-2)',
                 borderRadius: '8px', padding: '8px 12px', minWidth: '52px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <div style={{ fontSize: '22px' }}>📅</div>
+                <Icon name="calendarCheck" size={16} color="var(--text-mute)" />
               </div>
             )}
 

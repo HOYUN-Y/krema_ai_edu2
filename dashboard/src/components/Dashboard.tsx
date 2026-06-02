@@ -14,20 +14,21 @@ import AISummarySection from './AISummarySection'
 import ScheduleSection from './ScheduleSection'
 import AttachmentSection from './AttachmentSection'
 import RecruitmentSection from './RecruitmentSection'
+import Icon from './Icon'
 
 interface DashboardProps {
   data: SheetData
 }
 
 const TABS = [
-  { id: '메일 현황', icon: '📬' },
-  { id: '중요도 분석', icon: '📊' },
-  { id: '답장 필요', icon: '📩' },
-  { id: 'AI 요약', icon: '🤖' },
-  { id: '일정 추출', icon: '📅' },
-  { id: '첨부파일', icon: '📎' },
-  { id: '메일 통계', icon: '📈' },
-  { id: '채용 관리', icon: '💼' },
+  { id: '메일 현황', icon: 'inbox' },
+  { id: '중요도 분석', icon: 'barChart' },
+  { id: '답장 필요', icon: 'reply' },
+  { id: 'AI 요약', icon: 'sparkles' },
+  { id: '일정 추출', icon: 'calendar' },
+  { id: '첨부파일', icon: 'paperclip' },
+  { id: '메일 통계', icon: 'pieChart' },
+  { id: '채용 관리', icon: 'briefcase' },
 ]
 
 export default function Dashboard({ data }: DashboardProps) {
@@ -57,7 +58,10 @@ export default function Dashboard({ data }: DashboardProps) {
         zIndex: 100,
       }}>
         <div style={{ padding: '0 20px 20px', borderBottom: '1px solid var(--border)', marginBottom: '8px' }}>
-          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>📬 Mail Dashboard</div>
+          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Icon name="inbox" size={18} color="var(--accent)" />
+            Mail Dashboard
+          </div>
         </div>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id
@@ -70,19 +74,21 @@ export default function Dashboard({ data }: DashboardProps) {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '10px 20px',
+                paddingLeft: isActive ? '16px' : '20px',
                 cursor: 'pointer',
-                fontSize: '14px',
+                fontSize: '13px',
                 borderRadius: '8px',
                 margin: '2px 8px',
                 width: 'calc(100% - 16px)',
                 textAlign: 'left',
                 border: 'none',
+                borderLeft: isActive ? '4px solid var(--accent)' : '4px solid transparent',
                 background: isActive
                   ? 'color-mix(in oklch, var(--accent) 12%, transparent)'
                   : 'transparent',
                 color: isActive ? 'var(--accent)' : 'var(--text-dim)',
                 fontWeight: isActive ? 600 : 400,
-                transition: 'background 0.15s, color 0.15s',
+                transition: 'background 0.15s, color 0.15s, border-color 0.15s',
               }}
               onMouseEnter={(e) => {
                 if (!isActive) e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 6%, transparent)'
@@ -91,7 +97,7 @@ export default function Dashboard({ data }: DashboardProps) {
                 if (!isActive) e.currentTarget.style.background = 'transparent'
               }}
             >
-              <span>{tab.icon}</span>
+              <Icon name={tab.icon} size={16} />
               <span>{tab.id}</span>
             </button>
           )
@@ -111,7 +117,7 @@ export default function Dashboard({ data }: DashboardProps) {
         }}>
           <div>
             <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text)', marginBottom: '4px', letterSpacing: '-0.02em' }}>
-              {TABS.find((t) => t.id === activeTab)?.icon} {activeTab}
+              {activeTab}
             </h1>
             <p style={{ fontSize: '12px', color: 'var(--text-mute)' }}>
               마지막 업데이트: {fetchedDate} · 총 {data.rows.length}건
@@ -120,6 +126,9 @@ export default function Dashboard({ data }: DashboardProps) {
           <button
             onClick={() => router.refresh()}
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
               padding: '8px 16px',
               borderRadius: '8px',
               border: '1px solid color-mix(in oklch, var(--accent) 30%, var(--border))',
@@ -137,7 +146,8 @@ export default function Dashboard({ data }: DashboardProps) {
               (e.currentTarget.style.background = 'color-mix(in oklch, var(--accent) 10%, var(--surface))')
             }
           >
-            ↻ 새로고침
+            <Icon name="refresh" size={14} />
+            새로고침
           </button>
         </div>
 

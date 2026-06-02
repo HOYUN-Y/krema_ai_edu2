@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import type { MailRow } from '@/lib/types'
+import Icon from './Icon'
 
 interface Props { rows: MailRow[] }
 
@@ -55,12 +56,12 @@ export default function RecruitmentSection({ rows }: Props) {
   if (matched.length === 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ ...cardStyle, textAlign: 'center', padding: '48px 24px' }}>
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}>💼</div>
-          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)', marginBottom: '8px' }}>
+        <div style={{ border: '1px dashed var(--border)', borderRadius: '12px', textAlign: 'center', padding: '48px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <Icon name="briefcase" size={32} color="var(--text-mute)" />
+          <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)', margin: 0 }}>
             채용 관련 메일이 없습니다
           </p>
-          <p style={{ fontSize: '12px', color: 'var(--text-mute)', maxWidth: '380px', margin: '0 auto', lineHeight: 1.6 }}>
+          <p style={{ fontSize: '12px', color: 'var(--text-mute)', maxWidth: '380px', margin: '0', lineHeight: 1.6 }}>
             분류가 '채용'인 메일 또는 채용 관련 키워드(이력서, 면접, 지원 등)가 포함된 메일이 여기에 표시됩니다.
           </p>
         </div>

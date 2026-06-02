@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import type { MailRow } from '@/lib/types'
+import Icon from './Icon'
 
 interface Props { rows: MailRow[] }
 
@@ -10,23 +11,23 @@ function parseSenderName(sender: string): string {
   return m ? m[1].trim() : sender.split('@')[0]
 }
 
-const KEYWORDS: { word: string; icon: string; type: string }[] = [
-  { word: '계약서', icon: '📝', type: '계약/서명' },
-  { word: '서명', icon: '📝', type: '계약/서명' },
-  { word: '서명 페이지', icon: '📝', type: '계약/서명' },
-  { word: 'PDF', icon: '📄', type: '자료' },
-  { word: '문서', icon: '📄', type: '자료' },
-  { word: '자료', icon: '📊', type: '자료' },
-  { word: '파일', icon: '📄', type: '자료' },
-  { word: '첨부', icon: '📄', type: '자료' },
-  { word: 'Teams', icon: '🔗', type: '링크' },
-  { word: '링크', icon: '🔗', type: '링크' },
+const KEYWORDS: { word: string; iconName: string; type: string }[] = [
+  { word: '계약서', iconName: 'penTool', type: '계약/서명' },
+  { word: '서명', iconName: 'penTool', type: '계약/서명' },
+  { word: '서명 페이지', iconName: 'penTool', type: '계약/서명' },
+  { word: 'PDF', iconName: 'fileText', type: '자료' },
+  { word: '문서', iconName: 'fileText', type: '자료' },
+  { word: '자료', iconName: 'barChart', type: '자료' },
+  { word: '파일', iconName: 'fileText', type: '자료' },
+  { word: '첨부', iconName: 'fileText', type: '자료' },
+  { word: 'Teams', iconName: 'link', type: '링크' },
+  { word: '링크', iconName: 'link', type: '링크' },
 ]
 
 interface AttachmentMatch {
   row: MailRow
   keyword: string
-  icon: string
+  iconName: string
   type: string
   excerpt: string
 }
@@ -62,7 +63,7 @@ export default function AttachmentSection({ rows }: Props) {
           results.push({
             row,
             keyword: kw.word,
-            icon: kw.icon,
+            iconName: kw.iconName,
             type: kw.type,
             excerpt: text.slice(start, end).trim(),
           })
@@ -79,9 +80,10 @@ export default function AttachmentSection({ rows }: Props) {
 
   if (matches.length === 0) {
     return (
-      <div style={{ ...cardStyle, textAlign: 'center', padding: '60px 24px' }}>
-        <div style={{ fontSize: '40px', marginBottom: '12px' }}>📎</div>
-        <p style={{ fontSize: '14px', color: 'var(--text-mute)' }}>감지된 첨부파일 관련 메일이 없습니다.</p>
+      <div style={{ border: '1px dashed var(--border)', borderRadius: '12px', textAlign: 'center', padding: '60px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+        <Icon name="paperclip" size={32} color="var(--text-mute)" />
+        <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)' }}>감지된 첨부파일 관련 메일이 없습니다</div>
+        <div style={{ fontSize: '12px', color: 'var(--text-mute)' }}>계약서, 문서, 링크 관련 키워드가 포함된 메일이 표시됩니다</div>
       </div>
     )
   }
@@ -101,7 +103,7 @@ export default function AttachmentSection({ rows }: Props) {
 
       {matches.map((m, idx) => (
         <div key={idx} style={{ ...cardStyle, display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-          <span style={{ fontSize: '28px', flexShrink: 0 }}>{m.icon}</span>
+          <div style={{ flexShrink: 0, marginTop: '2px' }}><Icon name={m.iconName} size={20} color="var(--text-mute)" /></div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '6px' }}>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>

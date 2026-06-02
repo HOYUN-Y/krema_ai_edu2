@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import type { MailRow } from '@/lib/types'
+import Icon from './Icon'
 
 interface Props { rows: MailRow[] }
 
@@ -46,8 +47,10 @@ export default function AISummarySection({ rows }: Props) {
       </div>
 
       {filtered.length === 0 && (
-        <div style={{ ...cardStyle, textAlign: 'center', padding: '40px' }}>
-          <p style={{ fontSize: '13px', color: 'var(--text-mute)' }}>AI 요약이 있는 메일이 없습니다.</p>
+        <div style={{ border: '1px dashed var(--border)', borderRadius: '12px', textAlign: 'center', padding: '48px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <Icon name="mail" size={32} color="var(--text-mute)" />
+          <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-dim)' }}>AI 요약이 있는 메일이 없습니다</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-mute)' }}>AI 초안이 생성된 메일이 표시됩니다</div>
         </div>
       )}
 
@@ -59,7 +62,7 @@ export default function AISummarySection({ rows }: Props) {
               <span style={pillStyle('var(--accent-3)')}>{r.category}</span>
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>{parseSenderName(r.sender)}</span>
               <span style={{ fontSize: '11px', color: 'var(--text-mute)' }}>{r.receivedAt}</span>
-              {r.isDelayed && <span style={pillStyle('var(--accent-2)')}>⚠ SLA 초과</span>}
+              {r.isDelayed && <span style={pillStyle('var(--accent-2)')}>SLA 초과</span>}
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
               <span style={{

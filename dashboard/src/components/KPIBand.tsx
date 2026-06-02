@@ -1,6 +1,7 @@
 'use client'
 
 import type { MailRow } from '@/lib/types'
+import Icon from './Icon'
 
 interface KPIBandProps {
   rows: MailRow[]
@@ -79,6 +80,7 @@ export default function KPIBand({ rows }: KPIBandProps) {
           background:
             'linear-gradient(135deg, color-mix(in oklch, var(--accent-2) 12%, var(--surface)), var(--surface))',
           border: '1px solid color-mix(in oklch, var(--accent-2) 30%, var(--border))',
+          borderLeft: '4px solid var(--accent-2)',
           borderRadius: '14px',
           padding: '16px 24px',
           marginBottom: '16px',
@@ -87,7 +89,7 @@ export default function KPIBand({ rows }: KPIBandProps) {
           gap: '12px',
         }}
       >
-        <span style={{ fontSize: '20px' }}>🔥</span>
+        <Icon name="flame" size={18} color="var(--accent-2)" />
         <div>
           <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)' }}>
             미회신 {needsReviewCount}건 중 {delayedAndReview}건 SLA 초과

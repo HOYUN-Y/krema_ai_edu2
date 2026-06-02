@@ -122,7 +122,7 @@ export default function ImportanceSection({ rows }: Props) {
                 </div>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <span style={pillStyle('var(--accent-3)')}>{r.category}</span>
-                  {r.isDelayed && <span style={pillStyle('var(--accent-2)')}>⚠ SLA 초과</span>}
+                  {r.isDelayed && <span style={pillStyle('var(--accent-2)')}>SLA 초과</span>}
                 </div>
               </div>
               {r.gmailLink && (
